@@ -4,6 +4,7 @@
   <div [formGroup]="heroForm">
     <label>name: </label>
     <input [formControl]="heroForm.controls.name" placeholder="name"/>
+    <counter-input [formControl]="heroForm.controls.level"></counter-input>
   </div>
   <button (click)="goBack()">Back</button>
 </div>

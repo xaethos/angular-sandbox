@@ -38,7 +38,9 @@ export class HeroDetailComponent implements OnInit {
         .switchMap(id => this.heroService.getHero(id))
         .share();
 
-    let form = this.heroChanges.map(hero => this.fb.group(hero)).share();
+    let form = this.heroChanges
+        .map(hero => this.fb.group({ name: hero.name, level: 1 }))
+        .share();
 
     this.heroChanges.subscribe(hero => this.hero = hero);
     form.subscribe(form => this.heroForm = form);

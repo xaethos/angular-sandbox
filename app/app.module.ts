@@ -8,6 +8,8 @@ import { HeroesComponent } from './heroes.component';
 import { DashboardComponent } from './dashboard.component';
 import { HeroDetailComponent } from './hero-detail.component';
 
+import { CounterInputComponent } from './counter-input.component';
+
 import { HeroService }  from './hero.service';
 import { WikipediaService }  from './wikipedia.service';
 
@@ -26,7 +28,8 @@ import { AppRoutingModule }   from './app-routing.module';
     AppComponent,
     DashboardComponent,
     HeroesComponent,
-    HeroDetailComponent
+    HeroDetailComponent,
+    CounterInputComponent
   ],
   providers: [
     HeroService,
