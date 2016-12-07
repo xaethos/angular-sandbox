@@ -1,9 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/switchMap';
 
 import { HeroService } from './hero.service';
@@ -18,8 +20,12 @@ import { Hero } from './hero';
 })
 export class HeroDetailComponent implements OnInit {
   @Input() hero: Hero;
+  heroChanges: Observable<Hero>;
+
+  heroForm: FormGroup;
 
   constructor(
+    private fb: FormBuilder,
     private heroService: HeroService,
     private route: ActivatedRoute,
     private location: Location
@@ -27,10 +33,18 @@ export class HeroDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.params
+    this.heroChanges = this.route.params
         .map(params => +params['id'])
         .switchMap(id => this.heroService.getHero(id))
-        .subscribe(hero => this.hero = hero);
+        .share();
+
+    let form = this.heroChanges.map(hero => this.fb.group(hero)).share();
+
+    this.heroChanges.subscribe(hero => this.hero = hero);
+    form.subscribe(form => this.heroForm = form);
+
+    form.switchMap(form => form.valueChanges)
+        .subscribe(value => console.log("form value", value));
   }
 
   goBack(): void {

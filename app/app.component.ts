@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
 
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/switchMap';
+
 @Component({
   moduleId: module.id,
   selector: 'my-app',
@@ -15,4 +20,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Tour of Heroes';
+
+  constructor() {
+  }
 }
