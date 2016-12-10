@@ -4,6 +4,8 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/switchMap';
@@ -12,6 +14,12 @@ import { HeroService } from './hero.service';
 
 import { Hero } from './hero';
 
+function equalHero(a: Hero, b: Hero) {
+  return a.id == b.id
+      && a.name == b.name
+      && a.level == b.level;
+}
+
 @Component({
   moduleId: module.id,
   selector: 'my-hero-detail',
@@ -19,10 +27,18 @@ import { Hero } from './hero';
   styleUrls: [ 'hero-detail.component.css' ]
 })
 export class HeroDetailComponent implements OnInit {
-  @Input() hero: Hero;
-  heroChanges: Observable<Hero>;
+  form: FormGroup;
 
-  heroForm: FormGroup;
+  readonly hero: Observable<Hero> = this.route.params
+      .map(params => +params['id'])
+      .switchMap(id => this.heroService.getHero(id))
+      .share();
+
+  readonly formValue: Observable<Hero> = this.hero
+      .map(hero => this.fb.group(hero))
+      .do(form => this.form = form)
+      .switchMap(form => form.valueChanges)
+      .share();
 
   constructor(
     private fb: FormBuilder,
@@ -33,20 +49,10 @@ export class HeroDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.heroChanges = this.route.params
-        .map(params => +params['id'])
-        .switchMap(id => this.heroService.getHero(id))
-        .share();
-
-    let form = this.heroChanges
-        .map(hero => this.fb.group({ name: hero.name, level: 1 }))
-        .share();
-
-    this.heroChanges.subscribe(hero => this.hero = hero);
-    form.subscribe(form => this.heroForm = form);
-
-    form.switchMap(form => form.valueChanges)
-        .subscribe(value => console.log("form value", value));
+    this.formValue
+        .debounceTime(1500)
+        .distinctUntilChanged(equalHero)
+        .subscribe(hero => console.log("hero updated:", hero as Hero));
   }
 
   goBack(): void {

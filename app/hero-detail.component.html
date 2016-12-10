@@ -1,10 +1,13 @@
-<div *ngIf="hero">
-  <h2>{{hero.name}} details!</h2>
-  <div><label>id: </label>{{hero.id}}</div>
-  <div [formGroup]="heroForm">
+<div *ngIf="form" [formGroup]="form">
+  <h2>{{ form.controls.name.value }} details!</h2>
+  <div><label>id: </label>{{ form.controls.id.value }}</div>
+  <div>
     <label>name: </label>
-    <input [formControl]="heroForm.controls.name" placeholder="name"/>
-    <counter-input [formControl]="heroForm.controls.level"></counter-input>
+    <input formControlName="name" placeholder="name"/>
+  </div>
+  <div>
+    <label>level: </label>
+    <counter-input formControlName="level"></counter-input>
   </div>
   <button (click)="goBack()">Back</button>
 </div>

@@ -1,4 +1,7 @@
 export class Hero {
-  id: number;
-  name: string;
+  constructor(
+    readonly id: number,
+    readonly name: string,
+    readonly level: number
+  ) {}
 }

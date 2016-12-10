@@ -1,32 +1,47 @@
-import { Component, Input, forwardRef } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Component, forwardRef } from '@angular/core';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NG_VALIDATORS } from '@angular/forms';
+
+let accessor = forwardRef(() => CounterInputComponent)
+let validator = (control: FormControl) => {
+  const val = control.value
+  if (val >= 0 && val <= 10) return null;
+  return { rangeError: { given: val, min: 0, max: 10 } };
+};
 
 @Component({
   selector: 'counter-input',
   template: `
-    <button (click)="increment()">+</button>
-    {{counterValue}}
     <button (click)="decrement()">-</button>
+    {{value}}
+    <button (click)="increment()">+</button>
   `,
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CounterInputComponent), multi: true }
+    { provide: NG_VALUE_ACCESSOR, useExisting: accessor, multi: true },
+    { provide: NG_VALIDATORS, useValue: validator, multi: true }
   ]
 })
 export class CounterInputComponent implements ControlValueAccessor {
 
-  @Input() counterValue = 0;
+  private _value = 0;
 
   private propagateChange = (_: any) => {};
   private propagateTouched = (_: any) => {};
 
+  get value() {
+    return this._value;
+  }
+
+  set value(value: any) {
+    this._value = value;
+    this.propagateChange(value);
+  }
+
   increment() {
-    this.counterValue++;
-    this.propagateChange(this.counterValue);
+    this.value++;
   }
 
   decrement() {
-    this.counterValue--;
-    this.propagateChange(this.counterValue);
+    this.value--;
   }
 
   registerOnChange(fn: any) {
@@ -39,7 +54,7 @@ export class CounterInputComponent implements ControlValueAccessor {
 
   writeValue(value: any) {
     if (value !== undefined) {
-      this.counterValue = value;
+      this.value = value;
     }
   }
 }
